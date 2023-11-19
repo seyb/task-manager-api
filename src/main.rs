@@ -1,8 +1,11 @@
+use std::time::SystemTime;
+
+use axum::{Json, Router, routing::get};
 use axum::http::StatusCode;
-use axum::{routing::get, Json, Router};
+use serde::Serialize;
 
-use seybio_task_manager::{Collection, Task, TaskCollection};
-
+use std::env;
+use dotenv::dotenv;
 #[tokio::main]
 async fn main() {
     // initialize tracing
@@ -11,23 +14,36 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         // `GET /` goes to `root`
-        .route("/health", get(root))
+        .route("/health", get(healthy))
         .route("/tasks", get(get_tasks));
-    // run it with hyper on localhost:3000
-    axum::Server::bind(&"0.0.0.0:3001".parse().unwrap())
+
+    // Load the .env file
+    dotenv().ok();
+
+    let address = env::var("ADDRESS").expect("ADDRESS must be set");
+    let port = env::var("PORT").expect("PORT must be set");
+
+    let bind_address = format!("{}:{}", address, port);
+
+    axum::Server::bind(&bind_address.parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
 }
 
 // basic handler that responds with a static string
-async fn root() -> &'static str {
+async fn healthy() -> &'static str {
     "it works"
 }
 
-async fn get_tasks() -> (StatusCode, Json<Vec<Task>>) {
-    let mut collection = TaskCollection::new();
-    let task = Task::new("test");
-    collection.add_task(task);
-    (StatusCode::OK, Json(collection.tasks))
+#[derive(Serialize)]
+struct TasksResponse {
+    id: String,
+    description: String,
+    complete: Option<SystemTime>
+}
+
+async fn get_tasks() -> (StatusCode, Json<Vec<TasksResponse>>) {
+    let collections = vec![TasksResponse{ id: "test".to_string(), description:"description".to_string(), complete: None }];
+    (StatusCode::OK, Json(collections))
 }
