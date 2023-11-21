@@ -1,11 +1,11 @@
-use std::time::SystemTime;
-
-use axum::{Json, Router, routing::get};
-use axum::http::StatusCode;
+use axum::{Router, routing::get};
 use serde::Serialize;
 
 use std::env;
 use dotenv::dotenv;
+
+mod tasks;
+
 #[tokio::main]
 async fn main() {
     // initialize tracing
@@ -15,7 +15,7 @@ async fn main() {
     let app = Router::new()
         // `GET /` goes to `root`
         .route("/health", get(healthy))
-        .route("/tasks", get(get_tasks));
+        .route("/tasks", get(tasks::get_tasks));
 
     // Load the .env file
     dotenv().ok();
@@ -34,16 +34,4 @@ async fn main() {
 // basic handler that responds with a static string
 async fn healthy() -> &'static str {
     "it works"
-}
-
-#[derive(Serialize)]
-struct TasksResponse {
-    id: String,
-    description: String,
-    complete: Option<SystemTime>
-}
-
-async fn get_tasks() -> (StatusCode, Json<Vec<TasksResponse>>) {
-    let collections = vec![TasksResponse{ id: "test".to_string(), description:"description".to_string(), complete: None }];
-    (StatusCode::OK, Json(collections))
 }
