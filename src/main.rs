@@ -1,7 +1,6 @@
-use axum::{Router, routing::get};
-use serde::Serialize;
-
 use std::env;
+
+use axum::{Router, routing::get};
 use dotenv::dotenv;
 
 mod tasks;
