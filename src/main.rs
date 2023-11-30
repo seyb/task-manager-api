@@ -19,10 +19,10 @@ async fn main() {
     // Load the .env file
     dotenv().ok();
 
-    let address = env::var("ADDRESS").expect("ADDRESS must be set");
+/*    let address = env::var("ADDRESS").expect("ADDRESS must be set");*/
     let port = env::var("PORT").expect("PORT must be set");
 
-    let bind_address = format!("{}:{}", address, port);
+    let bind_address = format!("0.0.0.0:{}", port);
 
     axum::Server::bind(&bind_address.parse().unwrap())
         .serve(app.into_make_service())
