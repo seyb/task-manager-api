@@ -19,13 +19,12 @@ async fn main() {
     // Load the .env file
     dotenv().ok();
 
-/*    let address = env::var("ADDRESS").expect("ADDRESS must be set");*/
     let port = env::var("PORT").expect("PORT must be set");
 
     let bind_address = format!("0.0.0.0:{}", port);
 
     println!("Listening on: {}", bind_address);
-    let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap(); //net::TcpListener::bind(&bind_address.parse().unwrap()).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 
 }
