@@ -22,8 +22,7 @@ impl From<Task> for TaskApiResource {
 
 #[cfg(test)]
 mod tests {
-    use crate::tasks::api_resources::TaskApiResource;
-    use crate::tasks::domain::Task;
+    use super::*;
 
     #[test]
     fn it_serializes_tasks() {
@@ -33,5 +32,19 @@ mod tests {
         assert_eq!(expected_title, api_resource.title)
     }
 
-}
 
+    #[test]
+    fn it_maps_title() {
+        let task = Task::new("test title");
+        let api_resource = TaskApiResource::from(task);
+        assert_eq!("test title", api_resource.title);
+    }
+
+
+    #[test]
+    fn it_does_not_map_completed_at_if_not_present() {
+        let task = Task::new("test title");
+        let api_resource = TaskApiResource::from(task);
+        assert!(api_resource.completed_at.is_none());
+    }
+}

@@ -24,10 +24,10 @@ async fn main() {
 
     let bind_address = format!("0.0.0.0:{}", port);
 
-    axum::Server::bind(&bind_address.parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    println!("Listening on: {}", bind_address);
+    let listener = tokio::net::TcpListener::bind(bind_address).await.unwrap(); //net::TcpListener::bind(&bind_address.parse().unwrap()).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+
 }
 
 // basic handler that responds with a static string
